@@ -56,7 +56,10 @@ export async function fetchEmails(
   return results;
 }
 
-export async function summarizeWithGemini(text: string): Promise<string> {
+export async function summarizeWithGemini(
+  text: string,
+  prompt: string
+): Promise<string> {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
@@ -69,7 +72,7 @@ export async function summarizeWithGemini(text: string): Promise<string> {
           {
             parts: [
               {
-                text: `이메일 내용을 요약해줘:\n${text}`,
+                text: `${prompt}\n${text}`,
               },
             ],
           },
@@ -83,7 +86,7 @@ export async function summarizeWithGemini(text: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  const { query } = await request.json();
+  const { query, prompt } = await request.json();
   if (!query) {
     return NextResponse.json(
       { error: "Missing query parameter" },
@@ -91,9 +94,10 @@ export async function POST(request: Request) {
     );
   }
   try {
+    const summaryPrompt = prompt || "이메일 내용을 요약해줘:";
     const emails = await fetchEmails(query);
     const summaries = await Promise.all(
-      emails.map((e) => summarizeWithGemini(e.body))
+      emails.map((e) => summarizeWithGemini(e.body, summaryPrompt))
     );
     const response = emails.map((e, i) => ({
       id: e.id,

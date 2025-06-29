@@ -4,19 +4,15 @@ import axios from "axios";
 
 export default function HomePage() {
   const [query, setQuery] = useState("is:unread");
+  const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
   const [results, setResults] = useState<{ id: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleSummarize = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("/api/gmail/summarize", { query });
-      setResults(
-        res.data.summaries.map((item) => ({
-          id: item.id,
-          summary: item.summary.parts[0].text,
-        }))
-      );
+      const res = await axios.post("/api/gmail/summarize", { query, prompt });
+      setResults(res.data.summaries);
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,6 +28,13 @@ export default function HomePage() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Gmail search query (e.g. is:unread)"
+      />
+      <textarea
+        className="border p-2 w-full mb-4"
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Summary prompt"
+        rows={3}
       />
       <button
         onClick={handleSummarize}
