@@ -18,7 +18,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Before using the Gmail or Calendar summarizers, visit `/login` to authorize the
 app with Google. The refresh token will be stored in a cookie instead of a
-`.env` file.
+`.env` file. After logging in, open the home page (`/`) to summarize your unread
+emails and calendar events together.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
