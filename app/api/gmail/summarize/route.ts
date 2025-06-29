@@ -40,7 +40,7 @@ export async function fetchEmails(
   const listRes = await gmail.users.messages.list({
     userId: "me",
     q: query,
-    maxResults: 5,
+    maxResults: 50,
   });
   const messages = listRes.data.messages || [];
   const results: { id: string; body: string }[] = [];

@@ -12,7 +12,13 @@ export default function HomePage() {
     setLoading(true);
     try {
       const res = await axios.post("/api/gmail/summarize", { query, prompt });
-      setResults(res.data.summaries);
+      // do not change this line
+      setResults(
+        res.data.summaries.map((item) => ({
+          id: item.id,
+          summary: item.summary.parts?.[0].text,
+        }))
+      );
     } catch (err) {
       console.error(err);
     } finally {
