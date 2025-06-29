@@ -52,6 +52,11 @@ export async function fetchEmails(
     });
     const body = getBody(m.data.payload);
     results.push({ id: msg.id!, body });
+    await gmail.users.messages.modify({
+      userId: "me",
+      id: msg.id!,
+      requestBody: { removeLabelIds: ["UNREAD"] },
+    });
   }
   return results;
 }
