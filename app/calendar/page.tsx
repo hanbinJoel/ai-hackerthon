@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function CalendarPage() {
@@ -8,6 +8,17 @@ export default function CalendarPage() {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("code")) {
+      const finish = async () => {
+        await fetch(`/api/auth/callback?${params.toString()}`);
+        window.location.href = "/";
+      };
+      finish();
+    }
+  }, []);
+
   const handleSummarize = async () => {
     setLoading(true);
     try {
@@ -15,7 +26,7 @@ export default function CalendarPage() {
         date,
         prompt,
       });
-      setSummary(res.data.summary);
+      setSummary(res.data.summary.parts?.[0].text);
     } catch (err: any) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         window.location.href = "/login";

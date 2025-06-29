@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function HomePage() {
@@ -8,6 +8,17 @@ export default function HomePage() {
   const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
   const [results, setResults] = useState<{ id: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("code")) {
+      const finish = async () => {
+        await fetch(`/api/auth/callback?${params.toString()}`);
+        window.location.href = "/";
+      };
+      finish();
+    }
+  }, []);
 
   const handleSummarize = async () => {
     setLoading(true);
