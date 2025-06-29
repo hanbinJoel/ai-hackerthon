@@ -24,7 +24,11 @@ export default function HomePage() {
           summary: item.summary.parts?.[0].text,
         }))
       );
-    } catch (err) {
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       console.error(err);
     } finally {
       setLoading(false);
