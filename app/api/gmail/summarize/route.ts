@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { google } from "googleapis";
 import { Base64 } from "js-base64";
 
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
-
-oAuth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-});
-export const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+function getGmail() {
+  const refreshToken = cookies().get("refresh_token")?.value;
+  if (!refreshToken) {
+    throw new Error("Not authenticated");
+  }
+  const client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+  client.setCredentials({ refresh_token: refreshToken });
+  return google.gmail({ version: "v1", auth: client });
+}
 
 function getBody(payload: any): string {
   if (payload.body && payload.body.data) {
@@ -37,6 +41,7 @@ function getBody(payload: any): string {
 export async function fetchEmails(
   query: string = "is:unread"
 ): Promise<{ id: string; body: string }[]> {
+  const gmail = getGmail();
   const listRes = await gmail.users.messages.list({
     userId: "me",
     q: query,
@@ -111,6 +116,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ summaries: response });
   } catch (error: any) {
     console.error("Error summarizing emails:", error);
+    if (error.message === "Not authenticated") {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

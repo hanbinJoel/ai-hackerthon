@@ -1,18 +1,23 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
+import { cookies } from "next/headers";
 
-const oAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
-
-oAuth2Client.setCredentials({
-  refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
-});
-export const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+function getCalendar() {
+  const refreshToken = cookies().get("refresh_token")?.value;
+  if (!refreshToken) {
+    throw new Error("Not authenticated");
+  }
+  const client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+  );
+  client.setCredentials({ refresh_token: refreshToken });
+  return google.calendar({ version: "v3", auth: client });
+}
 
 async function fetchEvents(date: string) {
+  const calendar = getCalendar();
   const start = new Date(date);
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
@@ -64,6 +69,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ summary });
   } catch (error: any) {
     console.error("Error summarizing calendar:", error);
+    if (error.message === "Not authenticated") {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

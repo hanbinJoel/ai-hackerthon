@@ -16,7 +16,11 @@ export default function CalendarPage() {
         prompt,
       });
       setSummary(res.data.summary);
-    } catch (err) {
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
       console.error(err);
     } finally {
       setLoading(false);
