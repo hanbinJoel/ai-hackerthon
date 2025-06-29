@@ -3,8 +3,9 @@ import { cookies } from "next/headers";
 import { google } from "googleapis";
 import { Base64 } from "js-base64";
 
-function getGmail() {
-  const refreshToken = cookies().get("refresh_token")?.value;
+async function getGmail() {
+  const refreshToken = (await cookies()).get("refresh_token")?.value;
+
   if (!refreshToken) {
     throw new Error("Not authenticated");
   }
@@ -41,7 +42,7 @@ function getBody(payload: any): string {
 export async function fetchEmails(
   query: string = "is:unread"
 ): Promise<{ id: string; body: string }[]> {
-  const gmail = getGmail();
+  const gmail = await getGmail();
   const listRes = await gmail.users.messages.list({
     userId: "me",
     q: query,

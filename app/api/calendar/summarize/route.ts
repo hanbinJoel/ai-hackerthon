@@ -57,7 +57,10 @@ export async function summarizeWithGemini(text: string, prompt: string) {
 export async function POST(request: Request) {
   const { date, prompt } = await request.json();
   if (!date) {
-    return NextResponse.json({ error: "Missing date parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing date parameter" },
+      { status: 400 }
+    );
   }
   try {
     const events = await fetchEvents(date);

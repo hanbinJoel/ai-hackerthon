@@ -50,7 +50,9 @@ export default function CalendarPage() {
       >
         {loading ? "Summarizing..." : "Summarize Events"}
       </button>
-      {summary && <p className="border p-4 rounded whitespace-pre-wrap">{summary}</p>}
+      {summary && (
+        <p className="border p-4 rounded whitespace-pre-wrap">{summary}</p>
+      )}
     </main>
   );
 }
