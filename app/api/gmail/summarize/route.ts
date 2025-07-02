@@ -4,6 +4,45 @@ import { google } from "googleapis";
 import { Base64 } from "js-base64";
 import { summarizeWithGemini } from "@/lib/gemini";
 
+type Email = {
+  id: string;
+  body: string;
+  subject: string;
+  from: string;
+  category: string;
+};
+
+function getHeader(headers: any[], name: string): string {
+  const header = headers.find((h) => h.name.toLowerCase() === name.toLowerCase());
+  return header?.value || "";
+}
+
+function extractDomain(address: string): string {
+  const m = address.match(/<([^>]+)>/);
+  const email = (m ? m[1] : address).split("@")[1];
+  return email ? email.toLowerCase() : "";
+}
+
+function categorizeEmail(
+  subject: string,
+  from: string,
+  body: string,
+  userDomain: string
+): string {
+  const text = `${subject} ${from} ${body}`.toLowerCase();
+  if (text.includes("github")) return "github";
+  if (text.includes("jira") || text.includes("atlassian.net")) return "jira";
+  const fromDomain = extractDomain(from);
+  if (
+    fromDomain === userDomain ||
+    text.includes("oasis") ||
+    text.includes("공지")
+  ) {
+    return "internal";
+  }
+  return "external";
+}
+
 async function getGmail() {
   const refreshToken = (await cookies()).get("refresh_token")?.value;
 
@@ -40,25 +79,30 @@ function getBody(payload: any): string {
   return "";
 }
 
-async function fetchEmails(
-  query: string = "is:unread"
-): Promise<{ id: string; body: string }[]> {
+async function fetchEmails(query: string = "is:unread"): Promise<Email[]> {
   const gmail = await getGmail();
+  const profile = await gmail.users.getProfile({ userId: "me" });
+  const userDomain = profile.data.emailAddress?.split("@")[1]?.toLowerCase() || "";
+
   const listRes = await gmail.users.messages.list({
     userId: "me",
     q: query,
     maxResults: 50,
   });
   const messages = listRes.data.messages || [];
-  const results: { id: string; body: string }[] = [];
+  const results: Email[] = [];
   for (const msg of messages) {
     const m = await gmail.users.messages.get({
       userId: "me",
       id: msg.id!,
       format: "full",
     });
-    const body = getBody(m.data.payload);
-    results.push({ id: msg.id!, body });
+    const payload = m.data.payload!;
+    const body = getBody(payload);
+    const subject = getHeader(payload.headers || [], "Subject");
+    const from = getHeader(payload.headers || [], "From");
+    const category = categorizeEmail(subject, from, body, userDomain);
+    results.push({ id: msg.id!, body, subject, from, category });
     await gmail.users.messages.modify({
       userId: "me",
       id: msg.id!,
@@ -79,14 +123,21 @@ export async function POST(request: Request) {
   try {
     const summaryPrompt = prompt || "이메일 내용을 요약해줘:";
     const emails = await fetchEmails(query);
-    const summaries = await Promise.all(
-      emails.map((e) => summarizeWithGemini(e.body, summaryPrompt))
-    );
-    const response = emails.map((e, i) => ({
-      id: e.id,
-      summary: summaries[i],
-    }));
-    return NextResponse.json({ summaries: response });
+
+    const grouped: Record<string, Email[]> = {};
+    for (const email of emails) {
+      if (!grouped[email.category]) grouped[email.category] = [];
+      grouped[email.category].push(email);
+    }
+
+    const groupSummaries: { category: string; summary: string }[] = [];
+    for (const [category, list] of Object.entries(grouped)) {
+      const text = list.map((e) => e.body).join("\n");
+      const summary = await summarizeWithGemini(text, summaryPrompt);
+      groupSummaries.push({ category, summary });
+    }
+
+    return NextResponse.json({ groupSummaries });
   } catch (error: any) {
     console.error("Error summarizing emails:", error);
     if (error.message === "Not authenticated") {
