@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ summary });
   } catch (error: any) {
     console.error("Error summarizing calendar:", error);
-    if (error.message === "Not authenticated") {
+    if (error.status === 401) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
     return NextResponse.json({ error: error.message }, { status: 500 });

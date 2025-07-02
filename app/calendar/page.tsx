@@ -4,9 +4,10 @@ import axios from "axios";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [prompt, setPrompt] = useState("아래 일정들을 요약해줘:");
-  const [summary, setSummary] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [calPrompt, setCalPrompt] = useState("아래 일정들을 요약해줘:");
+  const [calSummary, setCalSummary] = useState("");
+  const [calLoading, setCalLoading] = useState(false);
+
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -19,14 +20,14 @@ export default function CalendarPage() {
     }
   }, []);
 
-  const handleSummarize = async () => {
-    setLoading(true);
+  const handleCalendarSummarize = async () => {
+    setCalLoading(true);
     try {
       const res = await axios.post("/api/calendar/summarize", {
         date,
-        prompt,
+        prompt: calPrompt,
       });
-      setSummary(res.data.summary.parts?.[0].text);
+      setCalSummary(res.data.summary.parts?.[0].text);
     } catch (err: any) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         window.location.href = "/login";
@@ -34,36 +35,40 @@ export default function CalendarPage() {
       }
       console.error(err);
     } finally {
-      setLoading(false);
+      setCalLoading(false);
     }
   };
 
+
+
   return (
-    <main className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        className="border p-2 w-full mb-4"
-      />
-      <textarea
-        className="border p-2 w-full mb-4"
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Summary prompt"
-        rows={3}
-      />
-      <button
-        onClick={handleSummarize}
-        disabled={loading}
-        className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
-      >
-        {loading ? "Summarizing..." : "Summarize Events"}
-      </button>
-      {summary && (
-        <p className="border p-4 rounded whitespace-pre-wrap">{summary}</p>
-      )}
+    <main className="p-6 max-w-xl mx-auto space-y-8">
+      <section>
+        <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="border p-2 w-full mb-4"
+        />
+        <textarea
+          className="border p-2 w-full mb-4"
+          value={calPrompt}
+          onChange={(e) => setCalPrompt(e.target.value)}
+          placeholder="Summary prompt"
+          rows={3}
+        />
+        <button
+          onClick={handleCalendarSummarize}
+          disabled={calLoading}
+          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
+        >
+          {calLoading ? "Summarizing..." : "Summarize Events"}
+        </button>
+        {calSummary && (
+          <p className="border p-4 rounded whitespace-pre-wrap">{calSummary}</p>
+        )}
+      </section>
     </main>
   );
 }
