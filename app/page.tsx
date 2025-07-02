@@ -9,10 +9,6 @@ export default function HomePage() {
   const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [calPrompt, setCalPrompt] = useState("아래 일정들을 요약해줘:");
-  const [calSummary, setCalSummary] = useState("");
-  const [calLoading, setCalLoading] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,24 +47,6 @@ export default function HomePage() {
     }
   };
 
-  const handleCalendarSummarize = async () => {
-    setCalLoading(true);
-    try {
-      const res = await axios.post("/api/calendar/summarize", {
-        date,
-        prompt: calPrompt,
-      });
-      setCalSummary(res.data.summary.parts?.[0].text);
-    } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        window.location.href = "/login";
-        return;
-      }
-      console.error(err);
-    } finally {
-      setCalLoading(false);
-    }
-  };
 
   return (
     <main className="p-6 max-w-xl mx-auto space-y-8">
@@ -106,32 +84,6 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
-      </section>
-      <section>
-        <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="border p-2 w-full mb-4"
-        />
-        <textarea
-          className="border p-2 w-full mb-4"
-          value={calPrompt}
-          onChange={(e) => setCalPrompt(e.target.value)}
-          placeholder="Summary prompt"
-          rows={3}
-        />
-        <button
-          onClick={handleCalendarSummarize}
-          disabled={calLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
-        >
-          {calLoading ? "Summarizing..." : "Summarize Events"}
-        </button>
-        {calSummary && (
-          <p className="border p-4 rounded whitespace-pre-wrap">{calSummary}</p>
-        )}
       </section>
     </main>
   );
