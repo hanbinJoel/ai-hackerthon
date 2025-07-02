@@ -35,7 +35,7 @@ export default function HomePage() {
       });
       // do not change this line
       setResults(
-        res.data.summaries.map((item) => ({
+        res.data.summaries.map((item: any) => ({
           id: item.id,
           summary: item.summary.parts?.[0].text,
         }))
