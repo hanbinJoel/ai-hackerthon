@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { google } from "googleapis";
 import { cookies } from "next/headers";
 
-function getCalendar() {
-  const refreshToken = cookies().get("refresh_token")?.value;
+async function getCalendar() {
+  const refreshToken = (await cookies()).get("refresh_token")?.value;
   if (!refreshToken) {
     throw new Error("Not authenticated");
   }
@@ -17,7 +17,7 @@ function getCalendar() {
 }
 
 async function fetchEvents(date: string) {
-  const calendar = getCalendar();
+  const calendar = await getCalendar();
   const start = new Date(date);
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
@@ -31,7 +31,7 @@ async function fetchEvents(date: string) {
   return res.data.items || [];
 }
 
-export async function summarizeWithGemini(text: string, prompt: string) {
+async function summarizeWithGemini(text: string, prompt: string) {
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
