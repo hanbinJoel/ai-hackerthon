@@ -39,7 +39,7 @@ function getBody(payload: any): string {
   return "";
 }
 
-export async function fetchEmails(
+async function fetchEmails(
   query: string = "is:unread"
 ): Promise<{ id: string; body: string }[]> {
   const gmail = await getGmail();
