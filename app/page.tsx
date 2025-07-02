@@ -6,7 +6,7 @@ export default function HomePage() {
   const query = "is:unread";
   const [days, setDays] = useState("1");
   const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
-  const [results, setResults] = useState<{ id: string; summary: string }[]>([]);
+  const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -35,8 +35,8 @@ export default function HomePage() {
       });
       // do not change this line
       setResults(
-        res.data.summaries.map((item: any) => ({
-          id: item.id,
+        res.data.groupSummaries.map((item: any) => ({
+          category: item.category,
           summary: item.summary.parts?.[0].text,
         }))
       );
@@ -100,8 +100,8 @@ export default function HomePage() {
         </button>
         <ul className="space-y-4">
           {results.map((r) => (
-            <li key={r.id} className="border p-4 rounded">
-              <p className="font-medium">Email ID: {r.id}</p>
+            <li key={r.category} className="border p-4 rounded">
+              <p className="font-medium">{r.category}</p>
               <p>{r.summary}</p>
             </li>
           ))}
