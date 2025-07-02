@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { google } from "googleapis";
 import { Base64 } from "js-base64";
+import { summarizeWithGemini } from "@/lib/gemini";
 
 async function getGmail() {
   const refreshToken = (await cookies()).get("refresh_token")?.value;
@@ -65,35 +66,6 @@ async function fetchEmails(
     });
   }
   return results;
-}
-
-export async function summarizeWithGemini(
-  text: string,
-  prompt: string
-): Promise<string> {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `${prompt}\n${text}`,
-              },
-            ],
-          },
-        ],
-      }),
-    }
-  );
-
-  const data = await res.json();
-  return data.candidates?.[0]?.content ?? "";
 }
 
 export async function POST(request: Request) {
