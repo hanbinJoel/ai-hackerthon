@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import MdxView from "@/components/MdxView";
 
 export default function HomePage() {
   const query = "is:unread";
@@ -99,9 +100,9 @@ export default function HomePage() {
         </button>
         <ul className="space-y-4">
           {results.map((r) => (
-            <li key={r.category} className="border p-4 rounded">
+            <li key={r.category} className="border p-4 rounded space-y-2">
               <p className="font-medium">{r.category}</p>
-              <p>{r.summary}</p>
+              <MdxView content={r.summary} />
             </li>
           ))}
         </ul>
