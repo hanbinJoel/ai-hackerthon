@@ -39,7 +39,7 @@ export default function HomePage() {
   const [days, setDays] = useState("1");
   const [count, setCount] = useState("15");
   const [markRead, setMarkRead] = useState(true);
-  const [excludeNotifications, setExcludeNotifications] = useState(true);
+  const [excludeNotifications, setExcludeNotifications] = useState(false);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [results, setResults] = useState<
     { category: string; label: string; summary: string }[]

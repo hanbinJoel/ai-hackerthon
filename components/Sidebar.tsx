@@ -12,9 +12,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import {usePathname} from "next/navigation";
 
 export default function Sidebar() {
   const [email, setEmail] = useState("");
+  const pathname = usePathname()
 
   useEffect(() => {
     axios
@@ -44,29 +46,27 @@ export default function Sidebar() {
                   <SidebarMenuButton
                     asChild
                     isActive={
-                      typeof window !== 'undefined' &&
-                      (window.location.pathname === '/' ||
-                        window.location.pathname.startsWith('/calendar'))
+                      pathname.startsWith('/')
                     }
                   >
                     <Link href="/">일정 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/gmail")}>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith("/gmail")}>
                     <Link href="/gmail">Gmail 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/jira")}>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith("/jira")}>
                     <Link href="/jira">Doc → Jira 🛠</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
+                <SidebarMenuButton asChild isActive={pathname.startsWith("/slack")}>
                   <Link href="/slack">Slack 요약 🛠️</Link>
                 </SidebarMenuButton>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/TBU")}>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith("/TBU")}>
                     <Link href="/TBU">TBU (더 많은 AI 기능들..!)</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
