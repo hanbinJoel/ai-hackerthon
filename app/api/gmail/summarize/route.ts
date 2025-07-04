@@ -149,7 +149,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ groupSummaries });
   } catch (error: any) {
-    console.error("Error summarizing emails:", error);
     if (error.status === 401 || error.message === 'Not authenticated') {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
