@@ -29,7 +29,7 @@ export default function Sidebar() {
       <ShadSidebar>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Profile</SidebarGroupLabel>
+            <SidebarGroupLabel>계정</SidebarGroupLabel>
             <SidebarGroupContent>
               <div className="text-xs text-muted-foreground break-all ml-2">
                 {email ? email : "Not logged in"}
@@ -37,7 +37,7 @@ export default function Sidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarGroup>
-            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupLabel>기능</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>

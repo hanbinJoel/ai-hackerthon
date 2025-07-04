@@ -14,12 +14,27 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
+const DEFAULT_PROMPT = `관심사 기반으로 묶기:
+내용이 유사한 주제(예: 회의 일정, 요청사항, 고객 피드백 등)끼리 그룹별로 묶어 요약해 주세요.
+각 그룹에는 짧은 제목(소제목)을 붙여 주세요.
+
+핵심만 요약하기:
+중요한 정보, 요청, 결정사항만 포함해 주세요.
+불필요한 수식어, 인사말, 배경 설명 등은 생략하세요.
+
+액션 아이템 강조:
+사용자가 해야 할 일(To-do), 응답 필요 여부, 기한 등이 있다면 눈에 띄게 정리해 주세요.
+(예: 🔔 응답 필요, 📅 마감일 등 이모지 사용 가능)
+
+문장 길이는 간결하게 유지:
+각 요약 항목은 2~3줄 이내로 작성해 주세요.`
+
 export default function HomePage() {
   const query = "is:unread";
   const [days, setDays] = useState("1");
-  const [count, setCount] = useState("5");
+  const [count, setCount] = useState("15");
   const [markRead, setMarkRead] = useState(true);
-  const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
+  const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -104,9 +119,9 @@ export default function HomePage() {
             <SelectValue placeholder="이메일 개수 선택" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="5">이메일 5개</SelectItem>
-            <SelectItem value="10">이메일 10개</SelectItem>
             <SelectItem value="15">이메일 15개</SelectItem>
+            <SelectItem value="30">이메일 30개</SelectItem>
+            <SelectItem value="50">이메일 50개</SelectItem>
           </SelectContent>
         </Select>
         <Label className="flex items-center mb-4 space-x-2">
