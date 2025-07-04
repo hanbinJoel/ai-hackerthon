@@ -9,10 +9,38 @@ function escapeHtml(text: string): string {
 }
 
 function parseInline(text: string): string {
-  return escapeHtml(text)
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/`([^`]+)`/g, "<code>$1</code>");
+  const escaped = escapeHtml(text);
+
+  const segments: string[] = [];
+  let lastIndex = 0;
+  const codeRegex = /`([^`]+)`/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = codeRegex.exec(escaped))) {
+    segments.push(
+      escaped
+        .slice(lastIndex, match.index)
+        .replace(/https?:\/\/[^\s]+/g, (url) =>
+          `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
+        )
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+    );
+    segments.push(`<code>${match[1]}</code>`);
+    lastIndex = codeRegex.lastIndex;
+  }
+
+  segments.push(
+    escaped
+      .slice(lastIndex)
+      .replace(/https?:\/\/[^\s]+/g, (url) =>
+        `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
+      )
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+  );
+
+  return segments.join("");
 }
 
 export function mdxToHtml(mdx: string): string {
