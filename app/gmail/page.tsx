@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -180,13 +182,26 @@ export default function HomePage() {
         >
           Save Prompt
         </Button>
-        <Button
-          onClick={handleSummarize}
-          disabled={loading}
-          className="mb-6"
-        >
-          {loading ? "Summarizing..." : "Summarize Emails"}
+        <Button onClick={handleSummarize} disabled={loading} className="mb-6">
+          {loading ? (
+            <>
+              <Spinner className="mr-2" /> Summarizing...
+            </>
+          ) : (
+            "Summarize Emails"
+          )}
         </Button>
+        {loading && (
+          <ul className="space-y-4 mb-6">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <li key={idx} className="border p-4 rounded space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+              </li>
+            ))}
+          </ul>
+        )}
         <ul className="space-y-4">
           {results.map((r) => (
             <li key={r.category} className="border p-4 rounded space-y-2">
