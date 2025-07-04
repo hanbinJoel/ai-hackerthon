@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import MdxView from "@/components/MdxView";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -66,7 +67,9 @@ export default function CalendarPage() {
           {calLoading ? "Summarizing..." : "Summarize Events"}
         </button>
         {calSummary && (
-          <p className="border p-4 rounded whitespace-pre-wrap">{calSummary}</p>
+          <div className="border p-4 rounded">
+            <MdxView content={calSummary} />
+          </div>
         )}
       </section>
     </main>
