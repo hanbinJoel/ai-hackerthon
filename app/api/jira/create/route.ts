@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import { google } from "googleapis";
 import { summarizeWithGemini } from "@/lib/gemini";
 
+const DEFAULT_PROMPT =
+  "다음 문서를 읽고 JIRA 티켓 생성을 위한 title과 description을 한국어 JSON으로 제공해줘. 형식: {\"title\":\"...\",\"description\":\"...\"}";
+
 function extractDocId(url: string): string | null {
   const m = url.match(/\/d\/(.+?)(?:\/|$)/);
   return m ? m[1] : null;
@@ -85,7 +88,7 @@ async function createJiraIssue(title: string, description: string) {
 }
 
 export async function POST(request: Request) {
-  const { url } = await request.json();
+  const { url, prompt } = await request.json();
   if (!url) {
     return NextResponse.json({ error: "Missing url" }, { status: 400 });
   }
@@ -95,9 +98,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid Google Docs url" }, { status: 400 });
     }
     const text = await fetchDocumentText(docId);
-    const prompt =
-      "다음 문서를 읽고 JIRA 티켓 생성을 위한 title과 description을 한국어 JSON으로 제공해줘. 형식: {\"title\":\"...\",\"description\":\"...\"}";
-    const summary = await summarizeWithGemini(text, prompt);
+    const summaryPrompt = prompt || DEFAULT_PROMPT;
+    const summary = await summarizeWithGemini(text, summaryPrompt);
     const parsed = parseJson(summary as any) || { title: "Auto Generated", description: summary as any };
     const key = await createJiraIssue(parsed.title, parsed.description);
     return NextResponse.json({ key });
