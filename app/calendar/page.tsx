@@ -57,11 +57,11 @@ export default function CalendarPage() {
       .catch((err) => console.error(err));
   }, []);
 
-  useEffect(() => {
+  const handleSavePrompt = () => {
     if (email) {
       localStorage.setItem(`calendar_prompt_${email}`, calPrompt);
     }
-  }, [email, calPrompt]);
+  };
 
   const handleCalendarSummarize = async () => {
     setCalLoading(true);
@@ -102,6 +102,13 @@ export default function CalendarPage() {
           rows={3}
         />
         <button
+          onClick={handleSavePrompt}
+          disabled={!email}
+          className="bg-gray-600 text-white px-4 py-2 rounded mb-2"
+        >
+          Save Prompt
+        </button>
+        <button
           onClick={handleCalendarSummarize}
           disabled={calLoading}
           className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
@@ -110,7 +117,7 @@ export default function CalendarPage() {
         </button>
         {calSummary && (
           <div className="border p-4 rounded">
-            <MdxView content={calSummary} />
+            <MdxView content={calSummary}/>
           </div>
         )}
       </section>

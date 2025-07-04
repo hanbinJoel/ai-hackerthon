@@ -38,11 +38,11 @@ export default function HomePage() {
       .catch((err) => console.error(err));
   }, []);
 
-  useEffect(() => {
+  const handleSavePrompt = () => {
     if (email) {
       localStorage.setItem(`gmail_prompt_${email}`, prompt);
     }
-  }, [email, prompt]);
+  };
 
   const handleSummarize = async () => {
     setLoading(true);
@@ -112,6 +112,13 @@ export default function HomePage() {
           rows={3}
         />
         <button
+          onClick={handleSavePrompt}
+          disabled={!email}
+          className="bg-gray-600 text-white px-4 py-2 rounded mb-2"
+        >
+          Save Prompt
+        </button>
+        <button
           onClick={handleSummarize}
           disabled={loading}
           className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
@@ -122,7 +129,7 @@ export default function HomePage() {
           {results.map((r) => (
             <li key={r.category} className="border p-4 rounded space-y-2">
               <p className="font-medium">{r.category}</p>
-              <MdxView content={r.summary} />
+              <MdxView content={r.summary}/>
             </li>
           ))}
         </ul>
