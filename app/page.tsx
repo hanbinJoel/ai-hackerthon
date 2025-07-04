@@ -30,7 +30,7 @@ const DEFAULT_PROMPT = `관심사 기반으로 묶기:
 각 요약 항목은 2~3줄 이내로 작성해 주세요.`
 
 export default function HomePage() {
-  const query = "is:unread";
+  const [unreadOnly, setUnreadOnly] = useState(true);
   const [days, setDays] = useState("1");
   const [count, setCount] = useState("15");
   const [markRead, setMarkRead] = useState(true);
@@ -73,7 +73,7 @@ export default function HomePage() {
   const handleSummarize = async () => {
     setLoading(true);
     try {
-      const searchQuery = `${query} newer_than:${days}d`;
+      const searchQuery = `${unreadOnly ? "is:unread " : ""}newer_than:${days}d`;
       const res = await axios.post("/api/gmail/summarize", {
         query: searchQuery,
         prompt,
@@ -127,11 +127,20 @@ export default function HomePage() {
         <Label className="flex items-center mb-4 space-x-2">
           <Input
             type="checkbox"
+            checked={unreadOnly}
+            onChange={(e) => setUnreadOnly(e.target.checked)}
+            className="w-4 h-4"
+          />
+          <span>읽지 않은 메일만</span>
+        </Label>
+        <Label className="flex items-center mb-4 space-x-2">
+          <Input
+            type="checkbox"
             checked={markRead}
             onChange={(e) => setMarkRead(e.target.checked)}
             className="w-4 h-4"
           />
-          <span>읽음 처리</span>
+          <span>요약된 이메일 읽음 처리</span>
         </Label>
         <Textarea
           value={prompt}

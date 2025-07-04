@@ -119,17 +119,11 @@ async function fetchEmails(
 }
 
 export async function POST(request: Request) {
-  const { query, prompt, count = 5, markRead = true } = await request.json();
-  if (!query) {
-    return NextResponse.json(
-      { error: "Missing query parameter" },
-      { status: 400 }
-    );
-  }
+  const { query = "", prompt, count = 15, markRead = true } = await request.json();
   try {
-    const allowedCounts = [5, 10, 15];
+    const allowedCounts = [15, 30, 50];
     const emailCount =
-      allowedCounts.includes(Number(count)) ? Number(count) : 5;
+      allowedCounts.includes(Number(count)) ? Number(count) : 15;
     const mark = Boolean(markRead);
     const summaryPrompt = prompt || "이메일 내용을 요약해줘:";
     const emails = await fetchEmails(query, emailCount, mark);
