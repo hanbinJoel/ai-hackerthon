@@ -11,6 +11,7 @@ export default function HomePage() {
   const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
   const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
 
   useEffect(() => {
@@ -23,6 +24,25 @@ export default function HomePage() {
       finish();
     }
   }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/profile")
+      .then((res) => {
+        if (res.data.email) {
+          setEmail(res.data.email);
+          const saved = localStorage.getItem(`gmail_prompt_${res.data.email}`);
+          if (saved) setPrompt(saved);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    if (email) {
+      localStorage.setItem(`gmail_prompt_${email}`, prompt);
+    }
+  }, [email, prompt]);
 
   const handleSummarize = async () => {
     setLoading(true);
