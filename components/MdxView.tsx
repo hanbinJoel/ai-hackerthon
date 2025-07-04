@@ -126,6 +126,6 @@ export function mdxToHtml(mdx: string): string {
 }
 
 export default function MdxView({ content }: { content: string }) {
-  return <div dangerouslySetInnerHTML={{ __html: mdxToHtml(content) }} />;
+  return <div className={'overflow-auto'} dangerouslySetInnerHTML={{ __html: mdxToHtml(content) }} />;
 }
 
