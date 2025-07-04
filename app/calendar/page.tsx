@@ -28,6 +28,7 @@ export default function CalendarPage() {
   const [calPrompt, setCalPrompt] = useState(DEFAULT_PROMPT);
   const [calSummary, setCalSummary] = useState("");
   const [calLoading, setCalLoading] = useState(false);
+  const [email, setEmail] = useState("");
 
 
   useEffect(() => {
@@ -40,6 +41,27 @@ export default function CalendarPage() {
       finish();
     }
   }, []);
+
+  useEffect(() => {
+    axios
+      .get("/api/profile")
+      .then((res) => {
+        if (res.data.email) {
+          setEmail(res.data.email);
+          const saved = localStorage.getItem(
+            `calendar_prompt_${res.data.email}`
+          );
+          if (saved) setCalPrompt(saved);
+        }
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    if (email) {
+      localStorage.setItem(`calendar_prompt_${email}`, calPrompt);
+    }
+  }, [email, calPrompt]);
 
   const handleCalendarSummarize = async () => {
     setCalLoading(true);
