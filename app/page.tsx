@@ -5,6 +5,8 @@ import axios from "axios";
 export default function HomePage() {
   const query = "is:unread";
   const [days, setDays] = useState("1");
+  const [count, setCount] = useState("5");
+  const [markRead, setMarkRead] = useState(true);
   const [prompt, setPrompt] = useState("이메일 내용을 요약해줘:");
   const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,8 @@ export default function HomePage() {
       const res = await axios.post("/api/gmail/summarize", {
         query: searchQuery,
         prompt,
+        count: Number(count),
+        markRead,
       });
       // do not change this line
       setResults(
@@ -62,6 +66,23 @@ export default function HomePage() {
           <option value="7">최근 1주</option>
           <option value="30">최근 1달</option>
         </select>
+        <select
+          className="border p-2 w-full mb-4"
+          value={count}
+          onChange={(e) => setCount(e.target.value)}
+        >
+          <option value="5">이메일 5개</option>
+          <option value="10">이메일 10개</option>
+          <option value="15">이메일 15개</option>
+        </select>
+        <label className="flex items-center mb-4 space-x-2">
+          <input
+            type="checkbox"
+            checked={markRead}
+            onChange={(e) => setMarkRead(e.target.checked)}
+          />
+          <span>읽음 처리</span>
+        </label>
         <textarea
           className="border p-2 w-full mb-4"
           value={prompt}

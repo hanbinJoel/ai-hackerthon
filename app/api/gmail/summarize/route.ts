@@ -79,7 +79,11 @@ function getBody(payload: any): string {
   return "";
 }
 
-async function fetchEmails(query: string = "is:unread"): Promise<Email[]> {
+async function fetchEmails(
+  query: string = "is:unread",
+  count: number,
+  markRead: boolean
+): Promise<Email[]> {
   const gmail = await getGmail();
   const profile = await gmail.users.getProfile({ userId: "me" });
   const userDomain = profile.data.emailAddress?.split("@")[1]?.toLowerCase() || "";
@@ -87,7 +91,7 @@ async function fetchEmails(query: string = "is:unread"): Promise<Email[]> {
   const listRes = await gmail.users.messages.list({
     userId: "me",
     q: query,
-    maxResults: 50,
+    maxResults: count,
   });
   const messages = listRes.data.messages || [];
   const results: Email[] = [];
@@ -103,17 +107,19 @@ async function fetchEmails(query: string = "is:unread"): Promise<Email[]> {
     const from = getHeader(payload.headers || [], "From");
     const category = categorizeEmail(subject, from, body, userDomain);
     results.push({ id: msg.id!, body, subject, from, category });
-    await gmail.users.messages.modify({
-      userId: "me",
-      id: msg.id!,
-      requestBody: { removeLabelIds: ["UNREAD"] },
-    });
+    if (markRead) {
+      await gmail.users.messages.modify({
+        userId: "me",
+        id: msg.id!,
+        requestBody: { removeLabelIds: ["UNREAD"] },
+      });
+    }
   }
   return results;
 }
 
 export async function POST(request: Request) {
-  const { query, prompt } = await request.json();
+  const { query, prompt, count = 5, markRead = true } = await request.json();
   if (!query) {
     return NextResponse.json(
       { error: "Missing query parameter" },
@@ -121,8 +127,12 @@ export async function POST(request: Request) {
     );
   }
   try {
+    const allowedCounts = [5, 10, 15];
+    const emailCount =
+      allowedCounts.includes(Number(count)) ? Number(count) : 5;
+    const mark = Boolean(markRead);
     const summaryPrompt = prompt || "이메일 내용을 요약해줘:";
-    const emails = await fetchEmails(query);
+    const emails = await fetchEmails(query, emailCount, mark);
 
     const grouped: Record<string, Email[]> = {};
     for (const email of emails) {
