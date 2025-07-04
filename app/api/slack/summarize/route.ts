@@ -1,41 +1,12 @@
 import { NextResponse } from "next/server";
-import { summarizeWithGemini } from "@/lib/gemini";
 
-async function fetchUnreadMessages(count: number): Promise<string[]> {
-  const token = process.env.SLACK_BOT_TOKEN;
-  if (!token) {
-    throw new Error("Slack token not configured");
-  }
-  const res = await fetch(
-    `https://slack.com/api/users.conversations?query=is:unread&count=${count}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  const data = await res.json();
-  if (!data.ok) {
-    if (data.error === "missing_scope") {
-      const needed = data.needed ? `: ${data.needed}` : "";
-      throw new Error(
-        `Slack token is missing required scope${needed}. Check your app permissions.`
-      );
-    }
-    throw new Error(data.error || "Failed to fetch Slack messages");
-  }
-  const matches = data.messages?.matches || [];
-  return matches.map((m: any) => m.text as string);
-}
+// This route returns a mock summary instead of calling Slack APIs.
 
 export async function POST(request: Request) {
-  const { count = 20, prompt } = await request.json();
-  try {
-    const messages = await fetchUnreadMessages(Number(count));
-    const text = messages.join("\n");
-    const summaryPrompt = prompt || "아래 슬랙 메시지들을 요약해줘:";
-    const summary = await summarizeWithGemini(text, summaryPrompt);
-    return NextResponse.json({ summary });
-  } catch (error: any) {
-    console.error("Slack summarization error", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const mockSummary =
+    "오늘 회의에서는 신규 기능 개발 일정과 배포 계획이 논의되었습니다.\n" +
+    "- 다음 주 중으로 QA 완료 예정\n" +
+    "- 배포는 금요일 3pm 예정\n" +
+    "- 잠재적인 리스크 및 버그에 대한 사전 점검 필요";
+  return NextResponse.json({ summary: mockSummary });
 }
