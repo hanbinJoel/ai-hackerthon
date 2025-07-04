@@ -38,11 +38,11 @@ export default function HomePage() {
       .catch((err) => console.error(err));
   }, []);
 
-  useEffect(() => {
+  const handleSavePrompt = () => {
     if (email) {
       localStorage.setItem(`gmail_prompt_${email}`, prompt);
     }
-  }, [email, prompt]);
+  };
 
   const handleSummarize = async () => {
     setLoading(true);
@@ -111,6 +111,13 @@ export default function HomePage() {
           placeholder="Summary prompt"
           rows={3}
         />
+        <button
+          onClick={handleSavePrompt}
+          disabled={!email}
+          className="bg-gray-600 text-white px-4 py-2 rounded mb-2"
+        >
+          Save Prompt
+        </button>
         <button
           onClick={handleSummarize}
           disabled={loading}
