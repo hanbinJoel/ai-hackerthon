@@ -43,6 +43,15 @@ function categorizeEmail(
   return "external";
 }
 
+function isNotificationEmail(subject: string, from: string, body: string): boolean {
+  const text = `${subject} ${from} ${body}`.toLowerCase();
+  if (text.includes("notification") || text.includes("alert") || text.includes("알림")) {
+    return true;
+  }
+  if (from.toLowerCase().includes("noreply")) return true;
+  return false;
+}
+
 async function getGmail() {
   const refreshToken = (await cookies()).get("refresh_token")?.value;
 
@@ -82,7 +91,8 @@ function getBody(payload: any): string {
 async function fetchEmails(
   query: string = "is:unread",
   count: number,
-  markRead: boolean
+  markRead: boolean,
+  excludeNotifications: boolean
 ): Promise<Email[]> {
   const gmail = await getGmail();
   const profile = await gmail.users.getProfile({ userId: "me" });
@@ -106,27 +116,29 @@ async function fetchEmails(
     const subject = getHeader(payload.headers || [], "Subject");
     const from = getHeader(payload.headers || [], "From");
     const category = categorizeEmail(subject, from, body, userDomain);
-    results.push({ id: msg.id!, body, subject, from, category });
-    if (markRead) {
-      await gmail.users.messages.modify({
-        userId: "me",
-        id: msg.id!,
-        requestBody: { removeLabelIds: ["UNREAD"] },
-      });
+    if (!excludeNotifications || !isNotificationEmail(subject, from, body)) {
+      results.push({ id: msg.id!, body, subject, from, category });
+      if (markRead) {
+        await gmail.users.messages.modify({
+          userId: "me",
+          id: msg.id!,
+          requestBody: { removeLabelIds: ["UNREAD"] },
+        });
+      }
     }
   }
   return results;
 }
 
 export async function POST(request: Request) {
-  const { query = "", prompt, count = 15, markRead = true } = await request.json();
+  const { query = "", prompt, count = 15, markRead = true, excludeNotifications = false } = await request.json();
   try {
     const allowedCounts = [15, 30, 50];
     const emailCount =
       allowedCounts.includes(Number(count)) ? Number(count) : 15;
     const mark = Boolean(markRead);
     const summaryPrompt = prompt || "이메일 내용을 요약해줘:";
-    const emails = await fetchEmails(query, emailCount, mark);
+    const emails = await fetchEmails(query, emailCount, mark, excludeNotifications);
 
     const grouped: Record<string, Email[]> = {};
     for (const email of emails) {
