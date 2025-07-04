@@ -22,6 +22,9 @@ export async function GET() {
     const profile = await gmail.users.getProfile({ userId: "me" });
     return NextResponse.json({ email: profile.data.emailAddress });
   } catch (error: any) {
+    if(error.message === 'Not authenticated'){
+      return NextResponse.json({ message: error.message }, { status: 200 });
+    }
     return NextResponse.json({ error: error.message }, { status: 401 });
   }
 }
