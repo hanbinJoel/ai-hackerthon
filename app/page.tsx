@@ -39,6 +39,7 @@ export default function HomePage() {
   const [days, setDays] = useState("1");
   const [count, setCount] = useState("15");
   const [markRead, setMarkRead] = useState(true);
+  const [excludeNotifications, setExcludeNotifications] = useState(true);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [results, setResults] = useState<
     { category: string; label: string; summary: string }[]
@@ -90,6 +91,7 @@ export default function HomePage() {
         prompt,
         count: Number(count),
         markRead,
+        excludeNotifications,
       });
       // do not change this line
       setResults(
@@ -153,6 +155,15 @@ export default function HomePage() {
             className="w-4 h-4"
           />
           <span>요약된 이메일 읽음 처리</span>
+        </Label>
+        <Label className="flex items-center mb-4 space-x-2">
+          <Input
+            type="checkbox"
+            checked={excludeNotifications}
+            onChange={(e) => setExcludeNotifications(e.target.checked)}
+            className="w-4 h-4"
+          />
+          <span>알림 메일 제외</span>
         </Label>
         <Textarea
           value={prompt}
