@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CalendarPage() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -45,32 +43,32 @@ export default function CalendarPage() {
 
   return (
     <main className="p-6 max-w-xl mx-auto space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Calendar Summarizer</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="border rounded-md p-2 w-full"
-          />
-          <textarea
-            className="border rounded-md p-2 w-full"
-            value={calPrompt}
-            onChange={(e) => setCalPrompt(e.target.value)}
-            placeholder="Summary prompt"
-            rows={3}
-          />
-          <Button onClick={handleCalendarSummarize} disabled={calLoading}>
-            {calLoading ? "Summarizing..." : "Summarize Events"}
-          </Button>
-          {calSummary && (
-            <p className="border p-4 rounded whitespace-pre-wrap">{calSummary}</p>
-          )}
-        </CardContent>
-      </Card>
+      <section>
+        <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="border p-2 w-full mb-4"
+        />
+        <textarea
+          className="border p-2 w-full mb-4"
+          value={calPrompt}
+          onChange={(e) => setCalPrompt(e.target.value)}
+          placeholder="Summary prompt"
+          rows={3}
+        />
+        <button
+          onClick={handleCalendarSummarize}
+          disabled={calLoading}
+          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
+        >
+          {calLoading ? "Summarizing..." : "Summarize Events"}
+        </button>
+        {calSummary && (
+          <p className="border p-4 rounded whitespace-pre-wrap">{calSummary}</p>
+        )}
+      </section>
     </main>
   );
 }

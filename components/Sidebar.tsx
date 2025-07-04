@@ -2,8 +2,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export default function Sidebar() {
   const [email, setEmail] = useState("");
@@ -18,27 +16,23 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <Card className="w-64 min-h-screen rounded-none border-r">
-      <CardHeader>
+    <div className="w-64 bg-gray-100 p-4 space-y-4 min-h-screen">
+      <div>
         <p className="font-bold mb-1">Profile</p>
         {email ? (
           <p className="text-sm break-all">{email}</p>
         ) : (
-          <p className="text-sm text-muted-foreground">Not logged in</p>
+          <p className="text-sm text-gray-500">Not logged in</p>
         )}
-      </CardHeader>
-      <nav className="space-y-2 px-6 pb-6">
-        <Link href="/">
-          <Button variant="outline" className="w-full justify-start">
-            Gmail Summary
-          </Button>
+      </div>
+      <nav className="space-y-2">
+        <Link href="/" className="block p-2 rounded hover:bg-gray-200">
+          Gmail Summary
         </Link>
-        <Link href="/calendar">
-          <Button variant="outline" className="w-full justify-start">
-            Calendar Summary
-          </Button>
+        <Link href="/calendar" className="block p-2 rounded hover:bg-gray-200">
+          Calendar Summary
         </Link>
       </nav>
-    </Card>
+    </div>
   );
 }

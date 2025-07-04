@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function HomePage() {
   const query = "is:unread";
@@ -56,13 +54,10 @@ export default function HomePage() {
 
   return (
     <main className="p-6 max-w-xl mx-auto space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Gmail Email Summarizer</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <select
-            className="border rounded-md p-2 w-full"
+      <section>
+        <h1 className="text-2xl font-bold mb-4">Gmail Email Summarizer</h1>
+        <select
+          className="border p-2 w-full mb-4"
           value={days}
           onChange={(e) => setDays(e.target.value)}
         >
@@ -71,8 +66,8 @@ export default function HomePage() {
           <option value="7">최근 1주</option>
           <option value="30">최근 1달</option>
         </select>
-          <select
-            className="border rounded-md p-2 w-full"
+        <select
+          className="border p-2 w-full mb-4"
           value={count}
           onChange={(e) => setCount(e.target.value)}
         >
@@ -80,7 +75,7 @@ export default function HomePage() {
           <option value="10">이메일 10개</option>
           <option value="15">이메일 15개</option>
         </select>
-          <label className="flex items-center space-x-2">
+        <label className="flex items-center mb-4 space-x-2">
           <input
             type="checkbox"
             checked={markRead}
@@ -88,30 +83,29 @@ export default function HomePage() {
           />
           <span>읽음 처리</span>
         </label>
-          <textarea
-            className="border rounded-md p-2 w-full"
+        <textarea
+          className="border p-2 w-full mb-4"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Summary prompt"
           rows={3}
         />
-          <Button onClick={handleSummarize} disabled={loading}>
-            {loading ? "Summarizing..." : "Summarize Emails"}
-          </Button>
-        </CardContent>
-      </Card>
-      <ul className="space-y-4">
+        <button
+          onClick={handleSummarize}
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
+        >
+          {loading ? "Summarizing..." : "Summarize Emails"}
+        </button>
+        <ul className="space-y-4">
           {results.map((r) => (
-            <Card key={r.category}>
-              <CardHeader>
-                <CardTitle className="text-lg">{r.category}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{r.summary}</p>
-              </CardContent>
-            </Card>
+            <li key={r.category} className="border p-4 rounded">
+              <p className="font-medium">{r.category}</p>
+              <p>{r.summary}</p>
+            </li>
           ))}
-      </ul>
+        </ul>
+      </section>
     </main>
   );
 }
