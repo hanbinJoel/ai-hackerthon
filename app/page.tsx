@@ -5,6 +5,7 @@ import MdxView from "@/components/MdxView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -39,7 +40,13 @@ export default function HomePage() {
   const [count, setCount] = useState("15");
   const [markRead, setMarkRead] = useState(true);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
-  const [results, setResults] = useState<{ category: string; summary: string }[]>([]);
+  const [results, setResults] = useState<
+    { category: string; label: string; summary: string }[]
+  >([]);
+  const CATEGORY_LABELS: Record<string, string> = {
+    internal: "사내 메일",
+    external: "사외 메일",
+  };
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
 
@@ -88,6 +95,7 @@ export default function HomePage() {
       setResults(
         res.data.groupSummaries.map((item: any) => ({
           category: item.category,
+          label: CATEGORY_LABELS[item.category] || item.category,
           summary: item.summary.parts?.[0].text,
         }))
       );
@@ -171,8 +179,8 @@ export default function HomePage() {
         <ul className="space-y-4">
           {results.map((r) => (
             <li key={r.category} className="border p-4 rounded space-y-2">
-              <p className="font-medium">{r.category}</p>
-              <MdxView content={r.summary}/>
+              <Badge variant={r.category as any}>{r.label}</Badge>
+              <MdxView content={r.summary} />
             </li>
           ))}
         </ul>
