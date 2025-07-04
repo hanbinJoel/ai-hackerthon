@@ -27,7 +27,11 @@ const DEFAULT_PROMPT = `관심사 기반으로 묶기:
 (예: 🔔 응답 필요, 📅 마감일 등 이모지 사용 가능)
 
 문장 길이는 간결하게 유지:
-각 요약 항목은 2~3줄 이내로 작성해 주세요.`
+각 요약 항목은 1줄로 간단하게 요약해주세요.
+
+원본 링크 추가:
+각 요약 항목에 대한 이메일 링크도 함께 전달해주세요.
+`
 
 export default function HomePage() {
   const [unreadOnly, setUnreadOnly] = useState(true);
