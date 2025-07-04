@@ -27,9 +27,6 @@ function parseInline(text: string): string {
         ) =>
           `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`,
         )
-        .replace(/https?:\/\/[^\s]+/g, (url) =>
-          `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
-        )
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
         .replace(/\*(.+?)\*/g, "<em>$1</em>")
     );
@@ -46,9 +43,6 @@ function parseInline(text: string): string {
         url,
       ) =>
         `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`,
-      )
-      .replace(/https?:\/\/[^\s]+/g, (url) =>
-        `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
       )
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.+?)\*/g, "<em>$1</em>")
