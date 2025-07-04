@@ -32,6 +32,7 @@ export default function CalendarPage() {
   const [calSummary, setCalSummary] = useState("");
   const [calLoading, setCalLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [meetLinks, setMeetLinks] = useState<{ summary: string; url: string }[]>([]);
 
 
   useEffect(() => {
@@ -74,6 +75,11 @@ export default function CalendarPage() {
         prompt: calPrompt,
       });
       setCalSummary(res.data.summary.parts?.[0].text);
+      if (Array.isArray(res.data.events)) {
+        setMeetLinks(res.data.events);
+      } else {
+        setMeetLinks([]);
+      }
     } catch (err: any) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         window.location.href = "/login";
@@ -120,8 +126,27 @@ export default function CalendarPage() {
           {calLoading ? "Summarizing..." : "Summarize Events"}
         </Button>
         {calSummary && (
+          <div className="border p-4 rounded mb-4">
+            <MdxView content={calSummary} />
+          </div>
+        )}
+        {meetLinks.length > 0 && (
           <div className="border p-4 rounded">
-            <MdxView content={calSummary}/>
+            <h2 className="font-medium mb-2">Google Meet Links</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              {meetLinks.map((m, idx) => (
+                <li key={idx}>
+                  <a
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {m.summary}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </section>
