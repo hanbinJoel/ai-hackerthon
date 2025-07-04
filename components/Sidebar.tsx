@@ -41,15 +41,22 @@ export default function Sidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname === "/"}>
-                    <Link href="/">Gmail 요약</Link>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/gmail")}> 
+                    <Link href="/gmail">Gmail 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/calendar")}>
-                    <Link href="/calendar">일정 요약</Link>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={
+                      typeof window !== 'undefined' &&
+                      (window.location.pathname === '/' ||
+                        window.location.pathname.startsWith('/calendar'))
+                    }
+                  >
+                    <Link href="/">일정 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
