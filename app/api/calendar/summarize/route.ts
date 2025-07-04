@@ -19,7 +19,8 @@ async function getCalendar() {
 
 async function fetchEvents(date: string) {
   const calendar = await getCalendar();
-  const start = new Date(date);
+  const tz = "Asia/Seoul";
+  const start = new Date(`${date}T00:00:00+09:00`);
   const end = new Date(start);
   end.setDate(start.getDate() + 1);
   const res = await calendar.events.list({
@@ -28,6 +29,7 @@ async function fetchEvents(date: string) {
     timeMax: end.toISOString(),
     singleEvents: true,
     orderBy: "startTime",
+    timeZone: tz,
   });
   return res.data.items || [];
 }
