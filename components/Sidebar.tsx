@@ -46,7 +46,12 @@ export default function Sidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/calendar")}> 
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
+                    <Link href="/slack">Slack 요약</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/calendar")}>
                     <Link href="/calendar">일정 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
