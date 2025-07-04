@@ -14,6 +14,12 @@ async function fetchUnreadMessages(count: number): Promise<string[]> {
   );
   const data = await res.json();
   if (!data.ok) {
+    if (data.error === "missing_scope") {
+      const needed = data.needed ? `: ${data.needed}` : "";
+      throw new Error(
+        `Slack token is missing required scope${needed}. Check your app permissions.`
+      );
+    }
     throw new Error(data.error || "Failed to fetch Slack messages");
   }
   const matches = data.messages?.matches || [];
