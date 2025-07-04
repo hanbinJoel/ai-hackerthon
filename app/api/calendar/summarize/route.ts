@@ -3,6 +3,15 @@ import { google } from "googleapis";
 import { cookies } from "next/headers";
 import { summarizeWithGemini } from "@/lib/gemini";
 
+function getMeetLink(event: any): string | undefined {
+  return (
+    event.hangoutLink ||
+    event.conferenceData?.entryPoints?.find(
+      (ep: any) => ep.entryPointType === "video"
+    )?.uri
+  );
+}
+
 async function getCalendar() {
   const refreshToken = (await cookies()).get("refresh_token")?.value;
   if (!refreshToken) {
@@ -49,7 +58,13 @@ export async function POST(request: Request) {
       .join("\n");
     const summaryPrompt = prompt || "아래 일정들을 요약해줘:";
     const summary = await summarizeWithGemini(text, summaryPrompt);
-    return NextResponse.json({ summary });
+    const links = events
+      .map((e) => ({
+        summary: e.summary ?? "",
+        url: getMeetLink(e),
+      }))
+      .filter((e) => e.url);
+    return NextResponse.json({ summary, events: links });
   } catch (error: any) {
     console.error("Error summarizing calendar:", error);
     if (error.status === 401 || error.message === 'Not authenticated') {
