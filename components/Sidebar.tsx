@@ -1,7 +1,17 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Sidebar as ShadSidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
 
 export default function Sidebar() {
   const [email, setEmail] = useState("");
@@ -16,23 +26,34 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="w-64 bg-gray-100 p-4 space-y-4 min-h-screen">
-      <div>
-        <p className="font-bold mb-1">Profile</p>
-        {email ? (
-          <p className="text-sm break-all">{email}</p>
-        ) : (
-          <p className="text-sm text-gray-500">Not logged in</p>
-        )}
-      </div>
-      <nav className="space-y-2">
-        <Link href="/" className="block p-2 rounded hover:bg-gray-200">
-          Gmail Summary
-        </Link>
-        <Link href="/calendar" className="block p-2 rounded hover:bg-gray-200">
-          Calendar Summary
-        </Link>
-      </nav>
-    </div>
+      <ShadSidebar>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Profile</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="text-xs text-muted-foreground break-all ml-2">
+                {email ? email : "Not logged in"}
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname === "/"}>
+                    <Link href="/">Gmail 요약</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/calendar")}> 
+                    <Link href="/calendar">일정 요약</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </ShadSidebar>
   );
 }

@@ -2,6 +2,17 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import MdxView from "@/components/MdxView";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export default function HomePage() {
   const query = "is:unread";
@@ -77,54 +88,58 @@ export default function HomePage() {
     <main className="p-6 max-w-xl mx-auto space-y-8">
       <section>
         <h1 className="text-2xl font-bold mb-4">Gmail Email Summarizer</h1>
-        <select
-          className="border p-2 w-full mb-4"
-          value={days}
-          onChange={(e) => setDays(e.target.value)}
-        >
-          <option value="1">최근 1일</option>
-          <option value="3">최근 3일</option>
-          <option value="7">최근 1주</option>
-          <option value="30">최근 1달</option>
-        </select>
-        <select
-          className="border p-2 w-full mb-4"
-          value={count}
-          onChange={(e) => setCount(e.target.value)}
-        >
-          <option value="5">이메일 5개</option>
-          <option value="10">이메일 10개</option>
-          <option value="15">이메일 15개</option>
-        </select>
-        <label className="flex items-center mb-4 space-x-2">
-          <input
+        <Select value={days} onValueChange={setDays}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="최근 일수 선택" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">최근 1일</SelectItem>
+            <SelectItem value="3">최근 3일</SelectItem>
+            <SelectItem value="7">최근 1주</SelectItem>
+            <SelectItem value="30">최근 1달</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={count} onValueChange={setCount}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="이메일 개수 선택" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="5">이메일 5개</SelectItem>
+            <SelectItem value="10">이메일 10개</SelectItem>
+            <SelectItem value="15">이메일 15개</SelectItem>
+          </SelectContent>
+        </Select>
+        <Label className="flex items-center mb-4 space-x-2">
+          <Input
             type="checkbox"
             checked={markRead}
             onChange={(e) => setMarkRead(e.target.checked)}
+            className="w-4 h-4"
           />
           <span>읽음 처리</span>
-        </label>
-        <textarea
-          className="border p-2 w-full mb-4"
+        </Label>
+        <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Summary prompt"
           rows={3}
+          className="mb-4"
         />
-        <button
+        <Button
           onClick={handleSavePrompt}
           disabled={!email}
-          className="bg-gray-600 text-white px-4 py-2 rounded mb-2"
+          variant="secondary"
+          className="mb-2 mr-2"
         >
           Save Prompt
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleSummarize}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
+          className="mb-6"
         >
           {loading ? "Summarizing..." : "Summarize Emails"}
-        </button>
+        </Button>
         <ul className="space-y-4">
           {results.map((r) => (
             <li key={r.category} className="border p-4 rounded space-y-2">

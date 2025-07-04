@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import MdxView from "@/components/MdxView";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const DEFAULT_PROMPT =`아래의 구글 캘린더 일정을 읽고, 다음 조건을 만족하는 요약을 작성해줘:
 1. 비슷한 성격의 일정(예: 회의, 업무, 운동 등)은 묶어서 요약해줘.  
@@ -88,33 +91,34 @@ export default function CalendarPage() {
     <main className="p-6 max-w-xl mx-auto space-y-8">
       <section>
         <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
-        <input
+        <Input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="mb-4"
         />
-        <textarea
-          className="border p-2 w-full mb-4"
+        <Textarea
           value={calPrompt}
           onChange={(e) => setCalPrompt(e.target.value)}
           placeholder="Summary prompt"
           rows={3}
+          className="mb-4"
         />
-        <button
+        <Button
           onClick={handleSavePrompt}
           disabled={!email}
-          className="bg-gray-600 text-white px-4 py-2 rounded mb-2"
+          variant="secondary"
+          className="mb-2 mr-2"
         >
           Save Prompt
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleCalendarSummarize}
           disabled={calLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
+          className="mb-6"
         >
           {calLoading ? "Summarizing..." : "Summarize Events"}
-        </button>
+        </Button>
         {calSummary && (
           <div className="border p-4 rounded">
             <MdxView content={calSummary}/>
