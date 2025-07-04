@@ -85,7 +85,7 @@ async function fetchDocumentText(docId: string): Promise<string> {
 // }
 
 export async function POST(request: Request) {
-  const { url } = await request.json();
+  const { url, prompt } = await request.json();
   if (!url) {
     return NextResponse.json({ error: "Missing url" }, { status: 400 });
   }
@@ -95,8 +95,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid Google Docs url" }, { status: 400 });
     }
     const text = await fetchDocumentText(docId);
-    const prompt =
-      "다음 문서를 읽고 JIRA 티켓 생성을 위한 title과 description을 한국어 JSON으로 제공해줘. 형식: {\"title\":\"...\",\"description\":\"...\"}";
+
     const summary = await summarizeWithGemini(text, prompt);
     // const parsed = parseJson(summary as any) || { title: "Auto Generated", description: summary as any };
     // const key = await createJiraIssue(parsed.title, parsed.description);

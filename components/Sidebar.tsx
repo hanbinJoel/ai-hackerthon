@@ -57,14 +57,14 @@ export default function Sidebar() {
                     <Link href="/gmail">Gmail 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/jira")}>
+                    <Link href="/jira">Doc → Jira 🛠</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
                   <Link href="/slack">Slack 요약 🛠️</Link>
                 </SidebarMenuButton>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/jira")}>
-                    <Link href="/jira">Doc → Jira</Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/TBU")}>
                     <Link href="/TBU">TBU (더 많은 AI 기능들..!)</Link>
