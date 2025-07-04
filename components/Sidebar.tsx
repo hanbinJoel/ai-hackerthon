@@ -56,6 +56,11 @@ export default function Sidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/jira")}>
+                    <Link href="/jira">Doc → Jira</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/TBU")}>
                     <Link href="/TBU">TBU (더 많은 AI 기능들..!)</Link>
                   </SidebarMenuButton>
