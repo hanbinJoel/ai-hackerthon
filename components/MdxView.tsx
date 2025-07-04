@@ -20,6 +20,13 @@ function parseInline(text: string): string {
     segments.push(
       escaped
         .slice(lastIndex, match.index)
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (
+          _m,
+          text,
+          url,
+        ) =>
+          `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`,
+        )
         .replace(/https?:\/\/[^\s]+/g, (url) =>
           `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
         )
@@ -33,6 +40,13 @@ function parseInline(text: string): string {
   segments.push(
     escaped
       .slice(lastIndex)
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (
+        _m,
+        text,
+        url,
+      ) =>
+        `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${text}</a>`,
+      )
       .replace(/https?:\/\/[^\s]+/g, (url) =>
         `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`
       )
