@@ -5,51 +5,34 @@ import MdxView from "@/components/MdxView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 
-const DEFAULT_PROMPT = `관심사 기반으로 묶기:
-내용이 유사한 주제(예: 회의 일정, 요청사항, 고객 피드백 등)끼리 그룹별로 묶어 요약해 주세요.
-각 그룹에는 짧은 제목(소제목)을 붙여 주세요.
+const DEFAULT_PROMPT =`아래의 구글 캘린더 일정을 읽고, 다음 조건을 만족하는 요약을 작성해줘:
+1. 비슷한 성격의 일정(예: 회의, 업무, 운동 등)은 묶어서 요약해줘.  
+2. 반복적인 일정은 하나로 요약하고, 반복 빈도(매일, 매주 등)도 함께 알려줘.  
+3. 핵심 정보(무엇, 언제, 누구와)를 중심으로 간결하게 정리해줘.  
+4. 불필요한 세부 내용이나 위치 정보 등은 생략해도 좋아.  
+5. 관심사별 카테고리(예: 업무 / 회의 / 개인 / 헬스 등)로 나눠서 보여줘.  
+6. 일정의 시간 흐름이나 집중 시간대를 파악할 수 있게 정리해줘.
 
-핵심만 요약하기:
-중요한 정보, 요청, 결정사항만 포함해 주세요.
-불필요한 수식어, 인사말, 배경 설명 등은 생략하세요.
+## 📝 출력 형식 예시
+📅 주간 일정 요약 (7월 1일 ~ 7월 7일)
 
-액션 아이템 강조:
-사용자가 해야 할 일(To-do), 응답 필요 여부, 기한 등이 있다면 눈에 띄게 정리해 주세요.
-(예: 🔔 응답 필요, 📅 마감일 등 이모지 사용 가능)
+🔹 업무 관련  
+- 프로젝트 미팅 (화/목 10:00, 팀원들과)  
+- 디자인 리뷰 (수 15:00, 디자이너와)  
 
-문장 길이는 간결하게 유지:
-각 요약 항목은 1줄로 간단하게 요약해주세요.
-
-원본 링크 추가:
-각 요약 항목에 대한 이메일 링크도 함께 전달해주세요.
+🔹 시간대별 집중도  
+- 오전: 회의 다수 집중  
+- 오후: 개인 업무 및 일정 다수  
 `
 
-export default function HomePage() {
-  const [unreadOnly, setUnreadOnly] = useState(true);
-  const [days, setDays] = useState("1");
-  const [count, setCount] = useState("15");
-  const [markRead, setMarkRead] = useState(true);
-  const [excludeNotifications, setExcludeNotifications] = useState(true);
-  const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
-  const [results, setResults] = useState<
-    { category: string; label: string; summary: string }[]
-  >([]);
-  const CATEGORY_LABELS: Record<string, string> = {
-    internal: "사내 메일",
-    external: "사외 메일",
-  };
-  const [loading, setLoading] = useState(false);
+export default function CalendarPage() {
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [calPrompt, setCalPrompt] = useState(DEFAULT_PROMPT);
+  const [calSummary, setCalSummary] = useState("");
+  const [calLoading, setCalLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [meetLinks, setMeetLinks] = useState<{ summary: string; url: string }[]>([]);
 
 
   useEffect(() => {
@@ -69,8 +52,10 @@ export default function HomePage() {
       .then((res) => {
         if (res.data.email) {
           setEmail(res.data.email);
-          const saved = localStorage.getItem(`gmail_prompt_${res.data.email}`);
-          if (saved) setPrompt(saved);
+          const saved = localStorage.getItem(
+            `calendar_prompt_${res.data.email}`
+          );
+          if (saved) setCalPrompt(saved);
         }
       })
       .catch((err) => console.error(err));
@@ -78,29 +63,23 @@ export default function HomePage() {
 
   const handleSavePrompt = () => {
     if (email) {
-      localStorage.setItem(`gmail_prompt_${email}`, prompt);
+      localStorage.setItem(`calendar_prompt_${email}`, calPrompt);
     }
   };
 
-  const handleSummarize = async () => {
-    setLoading(true);
+  const handleCalendarSummarize = async () => {
+    setCalLoading(true);
     try {
-      const searchQuery = `${unreadOnly ? "is:unread " : ""}newer_than:${days}d`;
-      const res = await axios.post("/api/gmail/summarize", {
-        query: searchQuery,
-        prompt,
-        count: Number(count),
-        markRead,
-        excludeNotifications,
+      const res = await axios.post("/api/calendar/summarize", {
+        date,
+        prompt: calPrompt,
       });
-      // do not change this line
-      setResults(
-        res.data.groupSummaries.map((item: any) => ({
-          category: item.category,
-          label: CATEGORY_LABELS[item.category] || item.category,
-          summary: item.summary.parts?.[0].text,
-        }))
-      );
+      setCalSummary(res.data.summary.parts?.[0].text);
+      if (Array.isArray(res.data.events)) {
+        setMeetLinks(res.data.events);
+      } else {
+        setMeetLinks([]);
+      }
     } catch (err: any) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         window.location.href = "/login";
@@ -108,66 +87,25 @@ export default function HomePage() {
       }
       console.error(err);
     } finally {
-      setLoading(false);
+      setCalLoading(false);
     }
   };
+
 
 
   return (
     <main className="p-6 max-w-xl mx-auto space-y-8">
       <section>
-        <h1 className="text-2xl font-bold mb-4">Gmail Email Summarizer</h1>
-        <Select value={days} onValueChange={setDays}>
-          <SelectTrigger className="w-full mb-4">
-            <SelectValue placeholder="최근 일수 선택" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="1">최근 1일</SelectItem>
-            <SelectItem value="3">최근 3일</SelectItem>
-            <SelectItem value="7">최근 1주</SelectItem>
-            <SelectItem value="30">최근 1달</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={count} onValueChange={setCount}>
-          <SelectTrigger className="w-full mb-4">
-            <SelectValue placeholder="이메일 개수 선택" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="15">이메일 15개</SelectItem>
-            <SelectItem value="30">이메일 30개</SelectItem>
-            <SelectItem value="50">이메일 50개</SelectItem>
-          </SelectContent>
-        </Select>
-        <Label className="flex items-center mb-4 space-x-2">
-          <Input
-            type="checkbox"
-            checked={unreadOnly}
-            onChange={(e) => setUnreadOnly(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <span>읽지 않은 메일만</span>
-        </Label>
-        <Label className="flex items-center mb-4 space-x-2">
-          <Input
-            type="checkbox"
-            checked={markRead}
-            onChange={(e) => setMarkRead(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <span>요약된 이메일 읽음 처리</span>
-        </Label>
-        <Label className="flex items-center mb-4 space-x-2">
-          <Input
-            type="checkbox"
-            checked={excludeNotifications}
-            onChange={(e) => setExcludeNotifications(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <span>알림 메일 제외</span>
-        </Label>
+        <h1 className="text-2xl font-bold mb-4">Calendar Summarizer</h1>
+        <Input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="mb-4"
+        />
         <Textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          value={calPrompt}
+          onChange={(e) => setCalPrompt(e.target.value)}
           placeholder="Summary prompt"
           rows={3}
           className="mb-4"
@@ -181,20 +119,36 @@ export default function HomePage() {
           Save Prompt
         </Button>
         <Button
-          onClick={handleSummarize}
-          disabled={loading}
+          onClick={handleCalendarSummarize}
+          disabled={calLoading}
           className="mb-6"
         >
-          {loading ? "Summarizing..." : "Summarize Emails"}
+          {calLoading ? "Summarizing..." : "Summarize Events"}
         </Button>
-        <ul className="space-y-4">
-          {results.map((r) => (
-            <li key={r.category} className="border p-4 rounded space-y-2">
-              <Badge variant={r.category as any}>{r.label}</Badge>
-              <MdxView content={r.summary} />
-            </li>
-          ))}
-        </ul>
+        {calSummary && (
+          <div className="border p-4 rounded mb-4">
+            <MdxView content={calSummary} />
+          </div>
+        )}
+        {meetLinks.length > 0 && (
+          <div className="border p-4 rounded">
+            <h2 className="font-medium mb-2">Google Meet Links</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              {meetLinks.map((m, idx) => (
+                <li key={idx}>
+                  <a
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {m.summary}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </main>
   );
