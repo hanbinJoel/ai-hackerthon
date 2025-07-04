@@ -7,7 +7,7 @@ async function fetchUnreadMessages(count: number): Promise<string[]> {
     throw new Error("Slack token not configured");
   }
   const res = await fetch(
-    `https://slack.com/api/search.messages?query=is:unread&count=${count}`,
+    `https://slack.com/api/users.conversations?query=is:unread&count=${count}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

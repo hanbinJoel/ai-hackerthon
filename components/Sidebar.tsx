@@ -46,15 +46,15 @@ export default function Sidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
-                    <Link href="/slack">Slack 요약</Link>
-                  </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/calendar")}>
                     <Link href="/calendar">일정 요약</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/slack")}>
+                  <Link href="/slack">Slack 요약 🛠️</Link>
+                </SidebarMenuButton>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={typeof window !== 'undefined' && window.location.pathname.startsWith("/TBU")}>
                     <Link href="/TBU">TBU (더 많은 AI 기능들..!)</Link>

@@ -7,7 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 
 const DEFAULT_PROMPT = `아래 슬랙 메시지들을 요약해줘:
 - 중요하거나 긴급한 내용 위주로 정리해줘.
-- 비슷한 주제는 묶어서 보여줘.`;
+- 비슷한 주제는 묶어서 보여줘.
+- 읽지 않은 메시지들만 보여줘.
+`;
 
 export default function SlackPage() {
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
@@ -34,16 +36,18 @@ export default function SlackPage() {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={3}
-          className="mb-4"
+          className="mb-2"
         />
+        <div className={'text-red-400 text-sm mb-2'}>관리자의 승인이 필요한 기능입니다. 아직 승인을 받지 못했습니다..</div>
         <Button onClick={handleSummarize} disabled={loading} className="mb-6">
           {loading ? "Summarizing..." : "Summarize Messages"}
         </Button>
         {summary && (
           <div className="border p-4 rounded">
-            <MdxView content={summary} />
+            <MdxView content={summary}/>
           </div>
         )}
+
       </section>
     </main>
   );
