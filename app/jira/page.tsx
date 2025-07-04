@@ -3,11 +3,13 @@ import { useState } from "react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import MdxView from "@/components/MdxView";
 
 export default function JiraPage() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [summary, setSummary] = useState("");
 
   const handleCreate = async () => {
     setLoading(true);
@@ -15,6 +17,7 @@ export default function JiraPage() {
     try {
       const res = await axios.post("/api/jira/create", { url });
       setMessage(`Created issue ${res.data.key}`);
+      setSummary(res.data.summary?.parts?.[0].text);
     } catch (err: any) {
       const msg = err.response?.data?.error || err.message;
       setMessage(`Error: ${msg}`);
@@ -36,6 +39,7 @@ export default function JiraPage() {
         {loading ? "Creating..." : "Create JIRA Ticket"}
       </Button>
       {message && <p className="mt-4 break-all">{message}</p>}
+      {summary && <MdxView content={summary} />}
     </main>
   );
 }
