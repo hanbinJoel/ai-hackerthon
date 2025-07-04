@@ -53,17 +53,14 @@ function parseJson(text: string): { title: string; description: string } | null 
 
 async function createJiraIssue(title: string, description: string) {
   if (
-    !process.env.JIRA_BASE_URL ||
-    !process.env.JIRA_EMAIL ||
-    !process.env.JIRA_TOKEN ||
-    !process.env.JIRA_PROJECT_KEY
+    !process.env.JIRA_TOKEN
   ) {
     throw new Error("Jira environment variables not configured");
   }
   const auth = Buffer.from(
-    `${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`
+    `android-operation@bucketplace.net:${process.env.JIRA_TOKEN}`
   ).toString("base64");
-  const res = await fetch(`${process.env.JIRA_BASE_URL}/rest/api/3/issue`, {
+  const res = await fetch(`https://ohouse.atlassian.net/rest/api/3/issue`, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
@@ -72,7 +69,7 @@ async function createJiraIssue(title: string, description: string) {
     },
     body: JSON.stringify({
       fields: {
-        project: { key: process.env.JIRA_PROJECT_KEY },
+        project: { key: 'O2OPL' },
         summary: title,
         description,
         issuetype: { name: "Task" },
