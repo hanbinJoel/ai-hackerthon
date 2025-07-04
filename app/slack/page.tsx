@@ -20,7 +20,7 @@ export default function SlackPage() {
     setLoading(true);
     try {
       const res = await axios.post("/api/slack/summarize", { prompt });
-      setSummary(res.data.summary.parts?.[0].text ?? "");
+      setSummary(res.data.summary);
     } catch (err) {
       console.error(err);
     } finally {
