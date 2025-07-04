@@ -21,6 +21,21 @@ app with Google. The refresh token will be stored in a cookie instead of a
 `.env` file. After logging in, open the home page (`/`) to summarize your unread
 emails and calendar events together.
 
+### Slack Summarizer Setup
+
+To summarize unread Slack messages, create a Slack app and generate a bot token.
+The token must include the following scopes:
+
+- `search:read`
+- `channels:history`
+- `groups:history`
+- `im:history`
+- `mpim:history`
+
+Set this token as the `SLACK_BOT_TOKEN` environment variable before running the
+server. If these scopes are missing, the API will respond with a `missing_scope`
+error.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
